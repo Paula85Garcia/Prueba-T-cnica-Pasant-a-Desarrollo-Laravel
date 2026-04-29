@@ -3,6 +3,11 @@
 use App\Http\Controllers\TareaController;
 use Illuminate\Support\Facades\Route;
 
+/*
+| Rutas de la mini-app de tareas.
+| Los nombres deben coincidir con el enunciado (tareas.*).
+*/
+
 Route::redirect('/', '/tareas');
 
 Route::get('/tareas', [TareaController::class, 'index'])->name('tareas.index');

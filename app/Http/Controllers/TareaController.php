@@ -6,8 +6,10 @@ use App\Models\Tarea;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+/** CRUD simple de tareas + toggle de completada (sin autenticación). */
 class TareaController extends Controller
 {
+    /** Lista todas las tareas, las más nuevas primero. */
     public function index()
     {
         $tareas = Tarea::orderByDesc('created_at')->get();
@@ -15,11 +17,13 @@ class TareaController extends Controller
         return view('tareas.index', compact('tareas'));
     }
 
+    /** Formulario vacío para crear una tarea. */
     public function create()
     {
         return view('tareas.create');
     }
 
+    /** Valida, guarda y vuelve al listado con mensaje. */
     public function store(Request $request)
     {
         $data = $this->validateTarea($request);
@@ -29,6 +33,7 @@ class TareaController extends Controller
         return redirect()->route('tareas.index')->with('success', 'Tarea creada correctamente.');
     }
 
+    /** Formulario con datos actuales de la tarea. */
     public function edit($id)
     {
         $tarea = Tarea::findOrFail($id);
@@ -36,6 +41,7 @@ class TareaController extends Controller
         return view('tareas.edit', compact('tarea'));
     }
 
+    /** Valida, actualiza y vuelve al listado con mensaje. */
     public function update(Request $request, $id)
     {
         $tarea = Tarea::findOrFail($id);
@@ -46,6 +52,7 @@ class TareaController extends Controller
         return redirect()->route('tareas.index')->with('success', 'Tarea actualizada correctamente.');
     }
 
+    /** Elimina y vuelve al listado con mensaje. */
     public function destroy($id)
     {
         $tarea = Tarea::findOrFail($id);
@@ -54,6 +61,7 @@ class TareaController extends Controller
         return redirect()->route('tareas.index')->with('success', 'Tarea eliminada.');
     }
 
+    /** Invierte completada; sin mensaje flash (según enunciado). */
     public function toggle($id)
     {
         $tarea = Tarea::findOrFail($id);
@@ -64,6 +72,7 @@ class TareaController extends Controller
         return redirect()->route('tareas.index');
     }
 
+    /** Reglas y textos de error exactos del enunciado. */
     private function validateTarea(Request $request): array
     {
         return $request->validate(
