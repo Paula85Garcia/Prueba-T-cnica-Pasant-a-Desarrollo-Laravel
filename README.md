@@ -1,91 +1,148 @@
-# Prueba Técnica - Gestión de Tareas (Laravel 11)
+# Prueba Tecnica - Gestion de Tareas (Laravel 11)
 
-Mini aplicación de tareas personales construida con Laravel 11, PHP 8 y SQLite.
+Mini aplicacion CRUD de tareas personales hecha con Laravel.
 
-**Autora:** Paula Garcia
+**Autora:** Paula Garcia  
+**Version Laravel:** 11.51.0  
+**Version PHP recomendada:** 8.2+
 
-## Tecnologías
-
-- PHP 8.2+ (recomendado; compatible con Laravel 11)
-- Laravel 11
-- Blade + Tailwind (CDN)
-- SQLite en local; Postgres en Render (producción)
-
-## Requisitos
+## Tecnologias usadas
 
 - PHP 8+
-- Composer
+- Laravel 11
+- Blade
+- Tailwind CSS por CDN
+- SQLite en local
+- Docker + PostgreSQL para Render
 
-## Instalación
+## Entregables de la prueba
 
-1. Instalar dependencias:
-   - `composer install`
-2. Crear archivo de entorno (si no existe):
-   - `copy .env.example .env`
-3. Generar clave de aplicación:
-   - `php artisan key:generate`
-4. Crear base SQLite:
-   - `type nul > database\database.sqlite`
-5. Ejecutar migraciones:
-   - `php artisan migrate`
+- `RESPUESTAS.md` (parte teorica)
+- Codigo fuente de la mini app de tareas
+- `README.md` con pasos de ejecucion local y notas de deploy
 
-## Ejecutar proyecto
+## Como correr el proyecto localmente
 
-- Levantar servidor local:
-  - `php artisan serve`
-- Abrir en navegador:
-  - `http://127.0.0.1:8000/tareas`
+> Ejecutar todos los comandos desde la raiz del proyecto.
 
-## Deploy en Render (Docker + Postgres)
+### 1) Clonar y entrar al proyecto
 
-Este repo incluye `render.yaml` + `Dockerfile` para desplegar como **Web Service** con **PostgreSQL** (más estable que SQLite en hosting).
+```bash
+git clone <URL_DEL_REPO>
+cd "Prueba Técnica"
+```
 
-### Opción A (recomendada): Blueprint
+### 2) Instalar dependencias PHP
 
-1. Sube estos archivos a tu repo en GitHub (cuando hagas commit):
-   - `Dockerfile`
-   - `docker/entrypoint.sh`
-   - `render.yaml`
-2. En Render: **New > Blueprint** y selecciona el repo.
-3. Variables de entorno (importante):
-   - **`APP_URL`**: pon la URL pública del servicio (ej. `https://TU-SERVICIO.onrender.com`).  
-     En Render la **clave** debe ser exactamente `APP_URL` y el **valor** la URL completa (no al revés).
-   - **`APP_KEY`**: si no usas Blueprint, genera una con `php artisan key:generate --show` en local y pégala en Render.
-4. Deploy: en el arranque se ejecuta `php artisan migrate --force` (ver `docker/entrypoint.sh`).
+```bash
+composer install
+```
 
-### Opción B: Web Service manual (si Render te sugiere Node)
+### 3) Crear archivo `.env`
 
-No uses **Node** para este proyecto.
+**Windows (PowerShell / CMD):**
 
-1. **New > Web Service** → elige el repo.
-2. **Runtime / Environment**: selecciona **Docker** (no Node).
-3. **Dockerfile Path**: `./Dockerfile` (raíz del repo).
-4. Crea también una base **PostgreSQL** en Render y define:
-   - `DB_CONNECTION=pgsql`
-   - `DB_URL=<connection string de Postgres>` (Render suele llamarlo *Internal Database URL*; Laravel lo lee como `DB_URL` en `config/database.php`)
-5. Define `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://...`, `APP_KEY=base64:...`.
-6. Deploy.
+```powershell
+copy .env.example .env
+```
 
-Referencia oficial de Blueprints: [Blueprint spec (Render)](https://render.com/docs/blueprint-spec)
+**Linux / macOS:**
+
+```bash
+cp .env.example .env
+```
+
+> El comando copia el archivo origen `.env.example` al archivo destino `.env` en la misma carpeta.
+
+### 4) Generar clave de la aplicacion
+
+```bash
+php artisan key:generate
+```
+
+### 5) Crear base SQLite local
+
+**Windows:**
+
+```powershell
+type nul > database\database.sqlite
+```
+
+**Linux / macOS:**
+
+```bash
+touch database/database.sqlite
+```
+
+### 6) Ejecutar migraciones
+
+```bash
+php artisan migrate
+```
+
+### 7) Levantar servidor
+
+```bash
+php artisan serve
+```
+
+Abrir en navegador:
+
+`http://127.0.0.1:8000/tareas`
+
+## Si en Windows no reconoce `php`
+
+Usar ruta completa de XAMPP:
+
+```powershell
+c:\xampp\php\php.exe artisan serve
+```
+
+Y para migrar:
+
+```powershell
+c:\xampp\php\php.exe artisan migrate
+```
 
 ## Rutas principales
 
-- `GET /tareas` - listado de tareas
-- `GET /tareas/crear` - formulario de creación
-- `POST /tareas` - guardar nueva tarea
-- `GET /tareas/{id}/editar` - formulario de edición
-- `PUT /tareas/{id}` - actualizar tarea
-- `DELETE /tareas/{id}` - eliminar tarea
-- `PATCH /tareas/{id}/toggle` - marcar/desmarcar completada
+- `GET /tareas` -> listado de tareas
+- `GET /tareas/crear` -> formulario de creacion
+- `POST /tareas` -> guardar tarea
+- `GET /tareas/{id}/editar` -> formulario de edicion
+- `PUT /tareas/{id}` -> actualizar tarea
+- `DELETE /tareas/{id}` -> eliminar tarea
+- `PATCH /tareas/{id}/toggle` -> completar/descompletar
 
-## Estructura importante
+## Pruebas
 
-- `app/Models/Tarea.php`
-- `app/Http/Controllers/TareaController.php`
-- `database/migrations/*_create_tareas_table.php`
-- `routes/web.php`
-- `resources/views/layouts/app.blade.php`
-- `resources/views/tareas/index.blade.php`
-- `resources/views/tareas/create.blade.php`
-- `resources/views/tareas/edit.blade.php`
-- `Dockerfile`, `render.yaml`, `docker/entrypoint.sh`
+```bash
+php artisan test
+```
+
+## Deploy (opcional) en Render
+
+URL de despliegue:
+
+`https://prueba-tecnica-tareas.onrender.com`
+
+Este repositorio incluye:
+
+- `Dockerfile`
+- `docker/entrypoint.sh`
+- `render.yaml`
+
+### Configuracion minima recomendada en Render
+
+- `APP_ENV=production`
+- `APP_DEBUG=false`
+- `APP_URL=https://TU-SERVICIO.onrender.com`
+- `APP_KEY=base64:...`
+- `DB_CONNECTION=pgsql`
+- `DB_URL=<connection string de Postgres>`
+- `SESSION_DRIVER=cookie`
+- `CACHE_STORE=file`
+- `QUEUE_CONNECTION=sync`
+- `LOG_CHANNEL=stderr`
+
+> Si falla el deploy, revisar logs de runtime en Render y buscar `Exception`, `SQLSTATE` o `APP_KEY`.
