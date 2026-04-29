@@ -1,14 +1,14 @@
 # Imagen para Render: Apache sirve /public y PHP ejecuta Laravel.
 FROM php:8.2-apache-bookworm
 
-# Extensiones típicas de Laravel + Postgres
+# Extensiones mínimas para Laravel + Postgres
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git \
         unzip \
         libzip-dev \
         libpq-dev \
-    && docker-php-ext-install pdo_pgsql pgsql zip opcache \
+    && docker-php-ext-install pdo_pgsql pgsql zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Composer (imagen oficial)
@@ -25,10 +25,13 @@ WORKDIR /var/www/html
 
 # Dependencias primero (mejor cache de build)
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --prefer-dist --no-interaction --no-ansi --optimize-autoloader
+RUN composer install --no-dev --prefer-dist --no-interaction --no-ansi --optimize-autoloader --no-scripts
 
 # Resto del código (sin vendor local; se instala arriba)
 COPY . .
+
+# Con el código completo ya disponible, ejecutamos scripts de Composer/Laravel.
+RUN composer run-script post-autoload-dump --no-interaction
 
 RUN mkdir -p storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
